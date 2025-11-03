@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Portfolio</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Inter Font & Fira Code (for terminal) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Fira+Code:wght@400;600&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Custom styles */
+        body {
+            font-family: 'Inter', sans-serif;
+            /* Add a subtle static/noise background for a tech feel */
+            background-color: #111827; /* bg-gray-900 */
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4' viewBox='0 0 4 4'%3E%3Cpath fill='%23374151' fill-opacity='0.1' d='M1 3h1v1H1V3zm2-2h1v1H3V1z'%3E%3C/path%3E%3C/svg%3E");
+        }
+        
+        /* Monospace font for terminal */
+        .font-mono {
+            font-family: 'Fira Code', monospace;
+        }
+
+        /* Hide all pages by default */
+        .page-content {
+            display: none;
+        }
+        /* Show the active page */
+        .page-content.active {
+            display: block;
+            /* Fade-in animation */
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- Navigation Bar --- */
+        .nav-link.active {
+            color: #60a5fa; /* text-blue-400 */
+            font-weight: 600;
+            /* Neon glow effect */
+            text-shadow: 0 0 8px rgba(96, 165, 250, 0.7);
+        }
+        .nav-link:hover {
+            color: #93c5fd; /* text-blue-300 */
+        }
+
+        /* --- Home Page Portal Cards --- */
+        .perspective-parent {
+            perspective: 1000px;
+        }
+        .portal-card {
+            background-color: #1f2937; /* bg-gray-800 */
+            border: 1px solid #374151; /* border-gray-700 */
+            transform-style: preserve-3d;
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+        .portal-card:hover {
+            transform: rotateY(-10deg) rotateX(5deg) scale(1.02);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        .portal-card .portal-glow {
+            opacity: 0;
+            position: absolute;
+            inset: -2px;
+            border-radius: 0.75rem; /* rounded-xl */
+            filter: blur(20px);
+            transition: opacity 0.4s ease;
+            z-index: -1;
+        }
+        .portal-card:hover .portal-glow {
+            opacity: 0.4;
+        }
+        /* Coding Card */
+        .portal-card-coding:hover {
+            border-color: #10b981;
+        }
+        .portal-card-coding .portal-glow {
+            background: #10b981;
+        }
+        /* Design Card */
+        .portal-card-design:hover {
+            border-color: #a855f7; /* purple-500 */
+        }
+        .portal-card-design .portal-glow {
+            background: #a855f7;
+        }
+        /* About Card */
+        .portal-card-about:hover {
+            border-color: #22c55e; /* green-500 */
+        }
+        .portal-card-about .portal-glow {
+            background: #22c55e;
+        }
+
+
+        /* --- 3D Button Style (base) --- */
+        .btn-3d {
+            border-radius: 0.5rem; /* rounded-lg */
+            font-weight: 600;
+            color: white;
+            transition: all 0.15s ease-out;
+            transform: translateZ(0); /* Hardware acceleration */
+            will-change: transform, border;
+            cursor: pointer;
+        }
+        .btn-3d:hover {
+            transform: translateY(-2px);
+        }
+        .btn-3d:active {
+            transform: translateY(1px);
+            filter: brightness(0.9);
+        }
+        .btn-3d:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: translateY(0);
+            border-bottom-width: 4px;
+        }
+        .btn-3d-blue { background-color: #2563eb; border-bottom: 4px solid #1d4ed8; }
+        .btn-3d-blue:hover:not(:disabled) { background-color: #3b82f6; border-bottom-width: 6px; }
+        .btn-3d-blue:active:not(:disabled) { border-bottom-width: 2px; }
+        .btn-3d-gray { background-color: #4b5563; border-bottom: 4px solid #1f2937; }
+        .btn-3d-gray:hover:not(:disabled) { background-color: #6b7280; border-bottom-width: 6px; }
+        .btn-3d-gray:active:not(:disabled) { border-bottom-width: 2px; }
+        .btn-3d-purple { background-color: #7c3aed; border-bottom: 4px solid #5b21b6; }
+        .btn-3d-purple:hover:not(:disabled) { background-color: #8b5cf6; border-bottom-width: 6px; }
+        .btn-3d-purple:active:not(:disabled) { border-bottom-width: 2px; }
+        .btn-3d-green { background-color: #16a34a; border-bottom: 4px solid #15803d; }
+        .btn-3d-green:hover:not(:disabled) { background-color: #22c55e; border-bottom-width: 6px; }
+        .btn-3d-green:active:not(:disabled) { border-bottom-width: 2px; }
+        
+        /* --- Terminal Theme --- */
+        .terminal-window {
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(5px);
+            border: 1px solid #10b981; /* emerald-500 */
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.3), inset 0 0 15px rgba(16, 185, 129, 0.2);
+        }
+        .cursor {
+            display: inline-block;
+            width: 10px;
+            height: 1.2em;
+            background: #10b981;
+            margin-left: 5px;
+            animation: blink 1s steps(1) infinite;
+        }
+        @keyframes blink {
+            50% { opacity: 0; }
+        }
+
+        /* --- Photoshop Theme --- */
+        .photoshop-window {
+            background: #374151; /* bg-gray-700 */
+            color: #d1d5db; /* text-gray-300 */
+            border: 1px solid #4b5563; /* border-gray-600 */
+        }
+        .ps-toolbar {
+            background: #1f2937; /* bg-gray-800 */
+            border-right: 1px solid #4b5563;
+        }
+        .ps-tool-icon {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            color: #9ca3af;
+            cursor: pointer;
+            border-radius: 0.25rem;
+            transition: all 0.2s ease;
+        }
+        .ps-tool-icon:hover {
+            background-color: #374151; /* bg-gray-700 */
+            color: #d1d5db;
+        }
+        .ps-tool-icon.active {
+            background: #4c566a;
+            color: white;
+        }
+        .ps-panels-right {
+            background: #1f2937; /* bg-gray-800 */
+            border-left: 1px solid #4b5563;
+        }
+        .ps-panel-header {
+            background: #374151;
+            padding: 0.5rem 0.75rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #d1d5db;
+            border-bottom: 1px solid #4b5563;
+        }
+        .ps-layer {
+            display: flex;
+            align-items: center;
+            font-size: 0.875rem;
+            padding: 0.5rem 0.75rem;
+            border-bottom: 1px solid #374151;
+            background-color: #2b374a;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .ps-layer:hover {
+            background-color: #323f54;
+        }
+        .ps-layer.active {
+            background-color: #434c5e;
+            color: white;
+        }
+        .ps-layer-thumb {
+            width: 40px;
+            height: 40px;
+            background: #4b5563;
+            border: 1px solid #1f2937;
+            margin-right: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+        }
+        .ps-canvas {
+            background-color: #2a3342; /* Darker canvas area */
+            overflow-y: auto;
+        }
+        .tilt-3d {
+            transition: transform 0.3s ease;
+        }
+        .group-hover .tilt-3d {
+            transform: rotateY(-10deg) rotateX(5deg) scale(1.05);
+        }
+
+        /* --- Social Icons --- */
+        .social-icon-3d {
+            background: #374151; border-bottom: 4px solid #1f2937;
+            border-radius: 9999px; padding: 0.75rem;
+            transform: translateZ(0); transition: all 0.15s ease-out;
+        }
+        .social-icon-3d:hover { background: #4b5563; transform: translateY(-3px); border-bottom-width: 6px; }
+        .social-icon-3d:active { background: #4b5563; transform: translateY(1px); border-bottom-width: 2px; }
+
+        /* --- Gemini Feature Styles --- */
+        .ai-input, .ai-textarea {
+            background-color: #374151; border: 1px solid #4b5563;
+            color: #f3f4f6; border-radius: 0.375rem;
+            width: 100%; padding: 0.75rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .ai-input:focus, .ai-textarea:focus {
+            outline: none; border-color: #22c55e;
+            box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.4);
+        }
+        .ai-textarea { min-height: 150px; font-family: 'Inter', sans-serif; }
+        .spinner {
+            width: 20px; height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%; border-top-color: #ffffff;
+            animation: spin 1s ease-in-out infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-100 antialiased">
+
+    <!-- Header & Navigation -->
+    <header class="bg-gray-800/70 shadow-lg sticky top-0 z-50 backdrop-filter backdrop-blur-md border-b border-gray-700/50">
+        <nav class="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo/Brand Name -->
+                <div class="flex-shrink-0">
+                    <a href="#home" data-target="home" class="nav-link text-2xl font-bold text-white font-mono">MyPortfolio<span class="text-blue-400">_&gt;</span></a>
+                </div>
+                <!-- Navigation Links -->
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="#home" data-target="home" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-300 active">/home</a>
+                        <a href="#coding" data-target="coding" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-300">/coding</a>
+                        <a href="#design" data-target="design" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-300">/design</a>
+                        <a href="#about" data-target="about" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-300">/about</a>
+                    </div>
+                </div>
+                <!-- Mobile Menu Button -->
+                <div class="md:hidden">
+                    <button class="text-gray-400 hover:text-white p-2 rounded-md">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                    </button>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+
+        <!-- ======================= -->
+        <!-- 0. HOME SECTION        -->
+        <!-- ======================= -->
+        <section id="home" class="page-content active">
+            <div class="text-center mb-16">
+                <h1 class="text-4xl md:text-6xl font-bold mb-4">Welcome to My Portfolio</h1>
+                <p class="text-lg md:text-xl text-gray-400 max-w-3xl mx-auto">
+                    A multi-disciplinary creative skilled in <span class="text-emerald-400 font-medium">software development</span> and <span class="text-purple-400 font-medium">visual design</span>. Explore my work.
+                </p>
+            </div>
+
+            <!-- Portal Cards Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-10 perspective-parent">
+                
+                <!-- Coding Portal -->
+                <div class="portal-card portal-card-coding rounded-xl p-8 relative cursor-pointer" data-target="coding">
+                    <div class="portal-glow"></div>
+                    <h2 class="font-mono text-3xl font-semibold text-emerald-400 mb-4">&gt; /coding</h2>
+                    <p class="text-gray-300 mb-6">View my technical projects, see my toolkit, and browse my code repositories.</p>
+                    <span class="font-medium text-emerald-400 group-hover:text-emerald-300 transition-colors">Enter Terminal &rarr;</span>
+                </div>
+                
+                <!-- Design Portal -->
+                <div class="portal-card portal-card-design rounded-xl p-8 relative cursor-pointer" data-target="design">
+                    <div class="portal-glow"></div>
+                    <h2 class="text-3xl font-semibold text-purple-400 mb-4">Artboard.psd</h2>
+                    <p class="text-gray-300 mb-6">Explore my creative gallery, from video editing stills to UI/UX mockups and branding.</p>
+                    <span class="font-medium text-purple-400 group-hover:text-purple-300 transition-colors">Open Design App &rarr;</span>
+                </div>
+
+                <!-- About Portal -->
+                <div class="portal-card portal-card-about rounded-xl p-8 relative cursor-pointer" data-target="about">
+                    <div class="portal-glow"></div>
+                    <h2 class="text-3xl font-semibold text-green-400 mb-4">About Me.md</h2>
+                    <p class="text-gray-300 mb-6">Learn more about my background, my passions, and how to get in touch (with AI assist!).</p>
+                    <span class="font-medium text-green-400 group-hover:text-green-300 transition-colors">Read Bio &rarr;</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- ======================= -->
+        <!-- 1. CODING SECTION      -->
+        <!-- ======================= -->
+        <section id="coding" class="page-content">
+            <!-- Terminal Window -->
+            <div class="terminal-window rounded-lg p-4 md:p-6 font-mono overflow-hidden">
+                <!-- Terminal Header -->
+                <div class="flex items-center pb-3 mb-4 border-b border-emerald-500/30">
+                    <div class="w-3 h-3 rounded-full bg-red-500 mr-2"></div>
+                    <div class="w-3 h-3 rounded-full bg-yellow-500 mr-2"></div>
+                    <div class="w-3 h-3 rounded-full bg-green-500 mr-auto"></div>
+                    <span class="text-gray-400 text-sm">user@portfolio: ~/coding</span>
+                </div>
+                
+                <!-- Terminal Body -->
+                <div class="mb-8">
+                    <h1 class="text-3xl md:text-4xl font-semibold mb-6 text-emerald-400 flex items-center">
+                        <span class="text-emerald-400 mr-2">$</span>
+                        <span class="text-gray-200 mr-2">ls</span>
+                        Software_Development
+                        <span class="cursor"></span>
+                    </h1>
+                </div>
+            
+                <!-- Skills -->
+                <div class="mb-12">
+                    <h2 class="text-2xl font-semibold mb-4 text-emerald-400">$ cat ./my_toolkit.txt</h2>
+                    <div class="flex flex-wrap gap-2 text-gray-200">
+                        <span class="bg-emerald-900/50 border border-emerald-700 px-3 py-1 rounded-md text-sm">&gt; Python</span>
+                        <span class="bg-emerald-900/50 border border-emerald-700 px-3 py-1 rounded-md text-sm">&gt; JavaScript</span>
+                        <span class="bg-emerald-900/50 border border-emerald-700 px-3 py-1 rounded-md text-sm">&gt; React</span>
+                        <span class="bg-emerald-900/50 border border-emerald-700 px-3 py-1 rounded-md text-sm">&gt; Node.js</span>
+                        <span class="bg-emerald-900/50 border border-emerald-700 px-3 py-1 rounded-md text-sm">&gt; SQL</span>
+                        <span class="bg-emerald-900/50 border border-emerald-700 px-3 py-1 rounded-md text-sm">&gt; Git & GitHub</span>
+                    </div>
+                </div>
+
+                <!-- Project Grid -->
+                <h2 class="text-2xl font-semibold mb-6 text-emerald-400">$ ./run featured_projects</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    
+                    <!-- Project Card 1 -->
+                    <div class="bg-gray-800/50 border border-gray-700 rounded-lg shadow-lg overflow-hidden transition-all duration-300 hover:shadow-emerald-500/20 hover:border-emerald-700">
+                        <img src="https://placehold.co/600x400/1f2937/10b981?text=Project+Thumbnail" alt="Project 1" class="w-full h-48 object-cover border-b border-gray-700">
+                        <div class="p-6">
+                            <h3 class="text-xl font-semibold mb-2 text-gray-100">E-commerce Platform</h3>
+                            <p class="text-gray-400 mb-4 text-sm">A full-stack e-commerce website built with React, Node.js, Express, and PostgreSQL.</p>
+                            <div class="flex gap-3">
+                                <a href="#" class="btn-3d btn-3d-blue py-2 px-4 text-sm">Live Demo</a>
+                                <a href="#" class="btn-3d btn-3d-gray py-2 px-4 text-sm">GitHub</a>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Project Card 2 & 3 (Omitted for brevity, same as before) -->
+                    <div class="bg-gray-800/50 border border-gray-700 rounded-lg shadow-lg overflow-hidden transition-all duration-300 hover:shadow-emerald-500/20 hover:border-emerald-700">...</div>
+                    <div class="bg-gray-800/50 border border-gray-700 rounded-lg shadow-lg overflow-hidden transition-all duration-300 hover:shadow-emerald-500/20 hover:border-emerald-700">...</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ======================= -->
+        <!-- 2. DESIGN SECTION (Photoshop Theme) -->
+        <!-- ======================= -->
+        <section id="design" class="page-content">
+            <!-- Photoshop App Window -->
+            <div class="photoshop-window rounded-lg shadow-2xl overflow-hidden flex h-[80vh] min-h-[600px]">
+                <!-- PS Toolbar -->
+                <div class="w-16 ps-toolbar p-2">
+                    <div class="flex flex-col gap-2 items-center">
+                        <div class="ps-tool-icon active" title="Select Tool">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 15l-3-3m0 0l3-3m-3 3h8M3 12a9 9 0 1118 0 9 9 0 01-18 0z"></path></svg>
+                        </div>
+                        <div class="ps-tool-icon" title="Pen Tool">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                        </div>
+                        <div class="ps-tool-icon" title="Text Tool">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7V4h16v3M4 10h16M8 10v10m8-10v10"></path></svg>
+                        </div>
+                        <div class="ps-tool-icon" title="Shapes Tool">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.5 3a1 1 0 011 1v1a1 1 0 11-2 0V4a1 1 0 011-1zM9.5 3a1 1 0 011 1v1a1 1 0 11-2 0V4a1 1 0 011-1zM3 9.5a1 1 0 011-1h1a1 1 0 110 2H4a1 1 0 01-1-1z..."></path></svg>
+                        </div>
+                        <div class="ps-tool-icon" title="Brush Tool">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Main Canvas Area -->
+                <div class="flex-1 p-6 md:p-10 ps-canvas">
+                    <h1 class="text-3xl md:text-4xl font-bold mb-8 text-purple-400">Editing & Graphic Design</h1>
+                    
+                    <!-- Skills -->
+                    <div class="mb-12">
+                        <h2 class="text-2xl font-semibold mb-4 text-gray-200">Design Tools</h2>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="bg-blue-800 text-white px-3 py-1 rounded-full text-sm font-medium shadow-md">Adobe Photoshop</span>
+                            <span class="bg-purple-800 text-white px-3 py-1 rounded-full text-sm font-medium shadow-md">Adobe Premiere Pro</span>
+                            <span class="bg-pink-600 text-white px-3 py-1 rounded-full text-sm font-medium shadow-md">Figma</span>
+                            <span class="bg-yellow-600 text-white px-3 py-1 rounded-full text-sm font-medium shadow-md">Adobe Illustrator</span>
+                        </div>
+                    </div>
+
+                    <!-- Gallery -->
+                    <h2 class="text-2xl font-semibold mb-6 text-gray-200">My Gallery</h2>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 perspective-parent">
+                        <!-- Gallery Image 1 -->
+                        <div class="group relative overflow-hidden rounded-lg shadow-lg">
+                            <img src="https://placehold.co/600x600/3730a3/e0e7ff?text=Design+Piece+1" alt="Design 1" class="w-full h-full object-cover tilt-3d">
+                            <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-opacity duration-300 flex items-center justify-center">
+                                <p class="text-white text-lg font-semibold opacity-0 group-hover:opacity-100 transition-opacity">Logo Design</p>
+                            </div>
+                        </div>
+                        <!-- Gallery Image 2 -->
+                        <div class="group relative overflow-hidden rounded-lg shadow-lg">
+                            <img src="https://placehold.co/600x600/c026d3/fdf4ff?text=Design+Piece+2" alt="Design 2" class="w-full h-full object-cover tilt-3d">
+                            <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-opacity duration-300 flex items-center justify-center">
+                                <p class="text-white text-lg font-semibold opacity-0 group-hover:opacity-100 transition-opacity">Video Edit Still</p>
+                            </div>
+                        </div>
+                        <!-- Gallery Image 3 -->
+                        <div class="group relative overflow-hidden rounded-lg shadow-lg">
+                            <img src="https://placehold.co/600x600/047857/d1fae5?text=Design+Piece+3" alt="Design 3" class="w-full h-full object-cover tilt-3d">
+                            <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-opacity duration-300 flex items-center justify-center">
+                                <p class="text-white text-lg font-semibold opacity-0 group-hover:opacity-100 transition-opacity">UI/UX Mockup</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PS Panels Right -->
+                <div class="w-64 ps-panels-right hidden lg:block">
+                    <!-- Layers Panel -->
+                    <div>
+                        <div class="ps-panel-header">Layers</div>
+                        <div class="flex flex-col-reverse">
+                            <div class="ps-layer">
+                                <div class="ps-layer-thumb">BG</div>
+                                <span>Background</span>
+                            </div>
+                            <div class="ps-layer active">
+                                <div class="ps-layer-thumb text-purple-300">Img</div>
+                                <span>Gallery Group</span>
+                            </div>
+                            <div class="ps-layer">
+                                <div class="ps-layer-thumb">T</div>
+                                <span>Header Text</span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Adjustments Panel -->
+                    <div class="mt-4">
+                        <div class="ps-panel-header">Adjustments</div>
+                        <!-- Add fake adjustment icons -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ======================= -->
+        <!-- 3. ABOUT SECTION       -->
+        <!-- ======================= -->
+        <section id="about" class="page-content">
+            <h1 class="text-3xl md:text-4xl font-bold mb-8 text-green-400">About Me</h1>
+            
+            <div class="bg-gray-800/70 backdrop-filter backdrop-blur-md border border-gray-700/50 p-8 rounded-lg shadow-xl">
+                <div class="flex flex-col md:flex-row items-center gap-8 md:gap-12">
+                    <!-- Profile Picture -->
+                    <div class="flex-shrink-0">
+                        <img src="https://placehold.co/200x200/34d399/1f2937?text=Your+Photo" alt="Profile Photo" class="w-40 h-40 md:w-48 md:h-48 rounded-full object-cover shadow-lg border-4 border-green-400">
+                    </div>
+                    <!-- Bio & Socials -->
+                    <div>
+                        <h2 class="text-3xl font-semibold mb-3">Hello, I'm [Your Name]</h2>
+                        <p class="text-gray-300 mb-4 leading-relaxed">
+                            I'm a passionate and creative individual with a love for both technology and design. My journey started with coding, building applications that solve real-world problems. Along the way, I discovered a passion for visual storytelling...
+                        </p>
+                        <p class="text-gray-300 mb-6 leading-relaxed">
+                            I thrive in environments where I can combine my technical skills with my artistic eye to create beautiful, functional, and engaging experiences.
+                        </p>
+                        
+                        <!-- Social Links -->
+                        <h3 class="text-xl font-semibold mb-4">Connect with me</h3>
+                        <div class="flex items-center space-x-4">
+                            <!-- LinkedIn -->
+                            <a href="#" class="social-icon-3d text-gray-300 hover:text-green-400" title="LinkedIn">
+                                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+                            </a>
+                            <!-- GitHub -->
+                            <a href="#" class="social-icon-3d text-gray-300 hover:text-green-400" title="GitHub">
+                                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.109-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.91 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                            </a>
+                            <!-- Twitter/X -->
+                            <a href="#" class="social-icon-3d text-gray-300 hover:text-green-400" title="Twitter/X">
+                                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H4.68l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- === GEMINI API FEATURE === -->
+                <div class="mt-12 border-t border-green-500/30 pt-8">
+                    <h3 class="text-2xl font-semibold mb-4 text-green-400">✨ AI Contact Assistant</h3>
+                    <p class="text-gray-400 mb-4 text-sm">Don't know what to write? Just type your inquiry's purpose below, and our AI will draft a professional message for you.</p>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label for="inquiry-prompt" class="block text-sm font-medium text-gray-300 mb-1">What's your inquiry about?</label>
+                            <input type="text" id="inquiry-prompt" class="ai-input" placeholder="e.g., Job offer for a React developer...">
+                        </div>
+                        
+                        <button id="generate-message-btn" class="btn-3d btn-3d-green py-2 px-5 text-sm inline-flex items-center gap-2">
+                            <div id="message-loader" class="spinner" style="display: none;"></div>
+                            <span id="generate-btn-text">Generate Message</span>
+                        </button>
+                        
+                        <div>
+                            <label for="generated-message" class="block text-sm font-medium text-gray-300 mb-1">Generated Message:</label>
+                            <textarea id="generated-message" class="ai-textarea" readonly placeholder="AI-drafted message will appear here..."></textarea>
+                        </div>
+                        
+                        <button id="copy-message-btn" class="btn-3d btn-3d-gray py-2 px-4 text-sm" style="display: none;">
+                            Copy to Clipboard
+                        </button>
+                    </div>
+                </div>
+                <!-- === END GEMINI FEATURE === -->
+
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800/50 mt-16 border-t border-gray-700/50">
+        <div class="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6 text-center text-gray-500">
+            <p>&copy; 2024 [Your Name]. All rights reserved.</p>
+        </div>
+    </footer>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const navLinks = document.querySelectorAll('.nav-link');
+            const pages = document.querySelectorAll('.page-content');
+            const portalCards = document.querySelectorAll('.portal-card');
+
+            // --- Page Navigation Logic ---
+            function showPage(targetId) {
+                // Hide all pages
+                pages.forEach(page => {
+                    page.classList.remove('active');
+                });
+                // Deactivate all nav links
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                });
+                // Show the target page
+                const targetPage = document.getElementById(targetId);
+                if (targetPage) {
+                    targetPage.classList.add('active');
+                    // Scroll to top of new page
+                    window.scrollTo(0, 0);
+                }
+                // Activate the target nav link
+                const targetLink = document.querySelector(`.nav-link[data-target="${targetId}"]`);
+                if (targetLink) {
+                    targetLink.classList.add('active');
+                }
+            }
+
+            // Nav link clicks
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault(); 
+                    const targetId = link.getAttribute('data-target');
+                    showPage(targetId);
+                    window.location.hash = targetId;
+                });
+            });
+
+            // Home page portal card clicks
+            portalCards.forEach(card => {
+                card.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const targetId = card.getAttribute('data-target');
+                    showPage(targetId);
+                    window.location.hash = targetId;
+                });
+            });
+
+            // Check for hash on page load
+            const currentHash = window.location.hash.substring(1);
+            if (currentHash && document.getElementById(currentHash)) {
+                showPage(currentHash);
+            } else {
+                showPage('home'); // Default to home page
+            }
+
+            // --- Gemini API Feature Logic ---
+
+            const API_KEY = ""; // Leave this empty.
+            const MODEL_NAME = "gemini-2.5-flash-preview-09-2025";
+            const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL_NAME}:generateContent?key=${API_KEY}`;
+
+            const generateBtn = document.getElementById('generate-message-btn');
+            const btnText = document.getElementById('generate-btn-text');
+            const loader = document.getElementById('message-loader');
+            const promptInput = document.getElementById('inquiry-prompt');
+            const resultArea = document.getElementById('generated-message');
+            const copyBtn = document.getElementById('copy-message-btn');
+
+            const YOUR_NAME = "[Your Name]"; // Set your name here
+
+            // System prompt to guide the AI
+            const systemPrompt = `You are a professional and friendly AI assistant on ${YOUR_NAME}'s personal portfolio. 
+Your job is to help a visitor draft a concise, professional, and friendly introductory message to ${YOUR_NAME}.
+The user will provide their inquiry's purpose. You must turn this into a polished message.
+The message should be from the visitor's perspective (e.g., "Hello ${YOUR_NAME}, I'm writing to you because...").
+Keep the message under 100 words.
+Start the message with "Hello ${YOUR_NAME},"
+Sign off with a placeholder like "[My Name]".`;
+
+            // Function to handle API call with exponential backoff
+            async function fetchWithBackoff(url, options, retries = 3, delay = 1000) {
+                try {
+                    const response = await fetch(url, options);
+                    if (!response.ok) {
+                        if (response.status === 429 && retries > 0) {
+                            // Throttled, wait and retry
+                            await new Promise(resolve => setTimeout(resolve, delay));
+                            return fetchWithBackoff(url, options, retries - 1, delay * 2);
+                        }
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return await response.json();
+                } catch (error) {
+                    console.error("Fetch error:", error);
+                    if (retries > 0) {
+                        // Network or other error, wait and retry
+                        await new Promise(resolve => setTimeout(resolve, delay));
+                        return fetchWithBackoff(url, options, retries - 1, delay * 2);
+                    }
+                    throw error; // Max retries reached
+                }
+            }
+
+            // Generate message function
+            async function generateMessage() {
+                const userQuery = promptInput.value.trim();
+                if (!userQuery) {
+                    resultArea.value = "Please enter your inquiry first.";
+                    return;
+                }
+
+                // Set loading state
+                generateBtn.disabled = true;
+                btnText.textContent = "Generating...";
+                loader.style.display = 'block';
+                resultArea.value = "";
+                copyBtn.style.display = 'none';
+
+                const payload = {
+                    contents: [{
+                        parts: [{ text: userQuery }]
+                    }],
+                    systemInstruction: {
+                        parts: [{ text: systemPrompt }]
+                    },
+                };
+
+                try {
+                    const result = await fetchWithBackoff(API_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
+
+                    if (text) {
+                        resultArea.value = text;
+                        copyBtn.style.display = 'inline-block';
+                        copyBtn.textContent = 'Copy to Clipboard';
+                    } else {
+                        throw new Error("Invalid response from API.");
+                    }
+
+                } catch (error) {
+                    console.error('Error calling Gemini API:', error);
+                    resultArea.value = "Sorry, an error occurred while generating the message. Please try again.";
+                } finally {
+                    // Reset UI
+                    generateBtn.disabled = false;
+                    btnText.textContent = "Generate Message";
+                    loader.style.display = 'none';
+                }
+            }
+
+            // Copy to clipboard function
+            function copyMessage() {
+                // Use document.execCommand for iframe compatibility
+                resultArea.select();
+                resultArea.setSelectionRange(0, 99999); // For mobile
+                try {
+                    document.execCommand('copy');
+                    copyBtn.textContent = 'Copied!';
+                    setTimeout(() => {
+                        copyBtn.textContent = 'Copy to Clipboard';
+                    }, 2000);
+                } catch (err) {
+                    console.error('Failed to copy text: ', err);
+                    copyBtn.textContent = 'Copy Failed';
+                }
+                // Deselect text
+                window.getSelection().removeAllRanges();
+            }
+
+            // Add event listeners
+            generateBtn.addEventListener('click', generateMessage);
+            copyBtn.addEventListener('click', copyMessage);
+        });
+    </script>
+
+</body>
+</html>
